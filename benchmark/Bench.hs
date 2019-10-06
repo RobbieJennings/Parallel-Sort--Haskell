@@ -1,13 +1,14 @@
-module Benchmarks where
+module Main where
 
 import Criterion.Main
 
 import Mergesort
 import Quicksort
 
-runBenchmarks = defaultMain benchmarks
+main = defaultMain benchmarks
 
-benchmarks = [ bgroup "Benchmarking"
+benchmarks :: [Benchmark]
+benchmarks = [ bgroup "Benchmarks"
                [ quicksortBenchmark
                , mergesortBenchmark
                ]
@@ -16,12 +17,14 @@ benchmarks = [ bgroup "Benchmarking"
 
 -------BENCHMARKING QUICKSORT--------
 
+quicksortBenchmark :: Benchmark
 quicksortBenchmark
  = bgroup "Quicksort"
     [ serialQuicksortBenchmark
     , parallelQuicksortBenchmark
     ]
 
+serialQuicksortBenchmark :: Benchmark
 serialQuicksortBenchmark
  = bgroup "Serial"
     [ bench "1,2,3"
@@ -30,6 +33,7 @@ serialQuicksortBenchmark
         ( whnf quicksortSerial [2,3,1] )
     ]
 
+parallelQuicksortBenchmark :: Benchmark
 parallelQuicksortBenchmark
  = bgroup "Parallel"
     [ bench "1,2,3"
@@ -41,12 +45,14 @@ parallelQuicksortBenchmark
 
 -------BENCHMARKING MERGESORT--------
 
+mergesortBenchmark :: Benchmark
 mergesortBenchmark
  = bgroup "Mergesort"
     [ serialMergesortBenchmark
     , parallelMergesortBenchmark
     ]
 
+serialMergesortBenchmark :: Benchmark
 serialMergesortBenchmark
  = bgroup "Serial"
     [ bench "1,2,3"
@@ -55,6 +61,7 @@ serialMergesortBenchmark
         ( whnf mergesortSerial [2,3,1] )
     ]
 
+parallelMergesortBenchmark :: Benchmark
 parallelMergesortBenchmark
  = bgroup "Parallel"
     [ bench "1,2,3"

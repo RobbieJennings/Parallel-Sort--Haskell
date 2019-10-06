@@ -1,5 +1,4 @@
-module Mergesort
-where
+module Mergesort where
 
 firstHalf  xs = take (div (length xs) 2) xs
 secondHalf xs = drop (div (length xs) 2) xs

@@ -1,5 +1,4 @@
-module Quicksort
-where
+module Quicksort where
 
 -- A sequential quicksort
 quicksortSerial :: Ord a => [a] -> [a]

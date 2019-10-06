@@ -24,36 +24,33 @@ dependencies:
 
 library:
   source-dirs: src
-  dependencies:
-  - HUnit
-  - test-framework
-  - test-framework-hunit
-  - criterion
 
 executables:
   parallel-sort-run-tests:
-    main:                RunTests.hs
-    source-dirs:         app
+    main:                Spec.hs
+    source-dirs:         test
     ghc-options:
-    - -main-is RunTests
     - -threaded
     - -eventlog
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - parallel-sort
+    - HUnit
+    - test-framework
+    - test-framework-hunit
 
   parallel-sort-run-benchmarks:
-    main:                RunBenchmarks.hs
-    source-dirs:         app
+    main:                Bench.hs
+    source-dirs:         benchmark
     ghc-options:
-    - -main-is RunBenchmarks
     - -threaded
     - -eventlog
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - parallel-sort
+    - criterion
 
 tests:
   parallel-sort-test:
@@ -65,10 +62,13 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - parallel-sort
+    - HUnit
+    - test-framework
+    - test-framework-hunit
 
 benchmarks:
   parallel-sort-benchmark:
-    main:                Main.hs
+    main:                Bench.hs
     source-dirs:         benchmark
     ghc-options:
     - -threaded
@@ -76,3 +76,4 @@ benchmarks:
     - -with-rtsopts=-N
     dependencies:
     - parallel-sort
+    - criterion
