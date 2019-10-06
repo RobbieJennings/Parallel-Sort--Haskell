@@ -27,14 +27,18 @@ library:
 
 executables:
   parallel-sort-exe:
-    main:                Main.hs
+    main:                ../test/Spec.hs
     source-dirs:         app
     ghc-options:
     - -threaded
+    - -eventlog
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - parallel-sort
+    - HUnit
+    - test-framework
+    - test-framework-hunit
 
 tests:
   parallel-sort-test:
