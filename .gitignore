@@ -1,4 +1,6 @@
 .stack-work/
 parallel-sort.cabal
-parallel-sort-exe.eventlog
+parallel-sort-run-benchmarks.eventlog
+parallel-sort-run-tests.eventlog
+benchmarks.html
 *~
