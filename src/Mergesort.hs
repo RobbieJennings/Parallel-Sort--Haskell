@@ -10,8 +10,8 @@ mergesortSerial :: Ord a => [a] -> [a]
 mergesortSerial [] = []
 mergesortSerial [a] = [a]
 mergesortSerial xs = mergeSerial
-                      (mergesortSerial (firstHalf xs))
-                      (mergesortSerial (secondHalf xs))
+                     (mergesortSerial (firstHalf xs))
+                     (mergesortSerial (secondHalf xs))
 
 mergeSerial :: Ord a => [a] -> [a] -> [a]
 mergeSerial xs [] = xs
@@ -25,9 +25,9 @@ mergesortParallel :: Ord a => [a] -> [a]
 mergesortParallel [] = []
 mergesortParallel [a] = [a]
 mergesortParallel xs = par firstHalf (pseq secondHalf (
-                        mergeParallel
-                        (mergesortParallel (firstHalf xs))
-                        (mergesortParallel (secondHalf xs))))
+                       mergeParallel
+                       (mergesortParallel (firstHalf xs))
+                       (mergesortParallel (secondHalf xs))))
 
 
 mergeParallel :: Ord a => [a] -> [a] -> [a]
