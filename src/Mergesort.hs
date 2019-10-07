@@ -1,5 +1,7 @@
 module Mergesort where
 
+import Control.Parallel
+
 firstHalf  xs = take (div (length xs) 2) xs
 secondHalf xs = drop (div (length xs) 2) xs
 
@@ -22,9 +24,10 @@ mergeSerial (x:xs) (y:ys) | x <= y    = x:mergeSerial xs (y:ys)
 mergesortParallel :: Ord a => [a] -> [a]
 mergesortParallel [] = []
 mergesortParallel [a] = [a]
-mergesortParallel xs = mergeParallel
+mergesortParallel xs = par firstHalf (pseq secondHalf (
+                        mergeParallel
                         (mergesortParallel (firstHalf xs))
-                        (mergesortParallel (secondHalf xs))
+                        (mergesortParallel (secondHalf xs))))
 
 
 mergeParallel :: Ord a => [a] -> [a] -> [a]

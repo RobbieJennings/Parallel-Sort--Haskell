@@ -24,6 +24,8 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - parallel
 
 executables:
   parallel-sort-run-tests:
