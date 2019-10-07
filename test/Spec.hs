@@ -10,10 +10,9 @@ import Mergesort
 import Quicksort
 
 main = do
-  g <- getStdGen
-  let hundred = (take 100 (randomRs (0,100) g))::[Int]
-  let thousand = (take 1000 (randomRs (0,100) g))::[Int]
-  let tenthousand = (take 10000 (randomRs (0,100) g))::[Int]
+  hundred <- sequence $ replicate 100 $ randomRIO (1,100::Int)
+  thousand <- sequence $ replicate 1000 $ randomRIO (1,100::Int)
+  tenthousand <- sequence $ replicate 10000 $ randomRIO (1,100::Int)
   defaultMain $ tests hundred thousand tenthousand
 
 tests :: [Int] -> [Int] -> [Int] -> [TF.Test]
