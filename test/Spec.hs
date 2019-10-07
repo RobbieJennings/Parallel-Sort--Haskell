@@ -9,83 +9,71 @@ import Data.Sort
 import Mergesort
 import Quicksort
 
-hundred = (take 100 (randomRs (0,100) (mkStdGen 42)))::[Int]
-thousand = (take 1000 (randomRs (0,100) (mkStdGen 42)))::[Int]
-tenthousand = (take 10000 (randomRs (0,100) (mkStdGen 42)))::[Int]
+main = do
+  g <- getStdGen
+  let hundred = (take 100 (randomRs (0,100) g))::[Int]
+  let thousand = (take 1000 (randomRs (0,100) g))::[Int]
+  let tenthousand = (take 10000 (randomRs (0,100) g))::[Int]
+  defaultMain $ tests hundred thousand tenthousand
 
-hundredSorted = sort hundred
-thousandSorted = sort thousand
-tenthousandSorted = sort tenthousand
+tests :: [Int] -> [Int] -> [Int] -> [TF.Test]
+tests hundred thousand tenthousand =
+ [ testGroup "\nQuicksort"
+   [ serialQuicksort hundred thousand tenthousand
+   , parallelQuicksort hundred thousand tenthousand
+   ]
+ , testGroup "\nMergesort"
+   [ serialQuicksort hundred thousand tenthousand
+   , parallelQuicksort hundred thousand tenthousand
+   ]
+ ]
 
-main = defaultMain tests
 
-tests :: [TF.Test]
-tests = [ testGroup "\nTesting Sorting Algorithms"
-          [ quicksortTest
-          , mergesortTest
-          ]
-        ]
+-------BENCHMARKING QUICKSORT--------
 
+serialQuicksort :: [Int] -> [Int] -> [Int] -> TF.Test
+serialQuicksort hundred thousand tenthousand
+  = testGroup "Serial"
+     [ testCase "100"
+         ( quicksortSerial hundred @?= sort hundred )
+     , testCase "1000"
+         ( quicksortSerial thousand @?= sort thousand )
+     , testCase "10000"
+         ( quicksortSerial tenthousand @?= sort tenthousand )
+     ]
 
--------TESTING QUICKSORT--------
-
-quicksortTest :: TF.Test
-quicksortTest
- = testGroup "\nTesting Quicksort"
-    [ serialQuicksortTest
-    , parallelQuicksortTest
-    ]
-
-serialQuicksortTest :: TF.Test
-serialQuicksortTest
- = testGroup "\nTesting Serial Quicksort"
+parallelQuicksort :: [Int] -> [Int] -> [Int] -> TF.Test
+parallelQuicksort hundred thousand tenthousand
+  = testGroup "Parallel"
     [ testCase "100"
-        ( quicksortSerial hundred @?= hundredSorted )
+        ( quicksortParallel hundred @?= sort hundred )
     , testCase "1000"
-        ( quicksortSerial thousand @?= thousandSorted )
+        ( quicksortParallel thousand @?= sort thousand )
     , testCase "10000"
-        ( quicksortSerial tenthousand @?= tenthousandSorted )
+        ( quicksortParallel tenthousand @?= sort tenthousand )
     ]
 
-parallelQuicksortTest :: TF.Test
-parallelQuicksortTest
- = testGroup "\nTesting Parllel Quicksort"
+
+-------BENCHMARKING MERGESORT--------
+
+serialMergesort :: [Int] -> [Int] -> [Int] -> TF.Test
+serialMergesort hundred thousand tenthousand
+  = testGroup "Serial"
      [ testCase "100"
-         ( quicksortParallel hundred @?= hundredSorted )
+         ( mergesortSerial hundred @?= sort hundred )
      , testCase "1000"
-         ( quicksortParallel thousand @?= thousandSorted )
+         ( mergesortSerial thousand @?= sort thousand )
      , testCase "10000"
-         ( quicksortParallel tenthousand @?= tenthousandSorted )
+         ( mergesortSerial tenthousand @?= sort tenthousand )
      ]
 
-
--------TESTING MERGESORT--------
-
-mergesortTest :: TF.Test
-mergesortTest
- = testGroup "\nTesting Mergesort"
-    [ serialMergesortTest
-    , parallelMergesortTest
+parallelMergesort :: [Int] -> [Int] -> [Int] -> TF.Test
+parallelMergesort hundred thousand tenthousand
+  = testGroup "Parallel"
+    [ testCase "100"
+        ( mergesortParallel hundred @?= sort hundred )
+    , testCase "1000"
+        ( mergesortParallel thousand @?= sort thousand )
+    , testCase "10000"
+        ( mergesortParallel tenthousand @?= sort tenthousand )
     ]
-
-serialMergesortTest :: TF.Test
-serialMergesortTest
- = testGroup "\nTesting Serial Mergesort"
-     [ testCase "100"
-         ( mergesortSerial hundred @?= hundredSorted )
-     , testCase "1000"
-         ( mergesortSerial thousand @?= thousandSorted )
-     , testCase "10000"
-         ( mergesortSerial tenthousand @?= tenthousandSorted )
-     ]
-
-parallelMergesortTest :: TF.Test
-parallelMergesortTest
- = testGroup "\nTesting Parllel Quicksort"
-     [ testCase "100"
-         ( mergesortParallel hundred @?= hundredSorted )
-     , testCase "1000"
-         ( mergesortParallel thousand @?= thousandSorted )
-     , testCase "10000"
-         ( mergesortParallel tenthousand @?= tenthousandSorted )
-     ]

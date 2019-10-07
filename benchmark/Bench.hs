@@ -6,31 +6,30 @@ import System.Random
 import Mergesort
 import Quicksort
 
-hundred = (take 100 (randomRs (0,100) (mkStdGen 42)))::[Int]
-thousand = (take 1000 (randomRs (0,100) (mkStdGen 42)))::[Int]
-tenthousand = (take 10000 (randomRs (0,100) (mkStdGen 42)))::[Int]
+main = do
+  g <- getStdGen
+  let hundred = (take 100 (randomRs (0,100) g))::[Int]
+  let thousand = (take 1000 (randomRs (0,100) g))::[Int]
+  let tenthousand = (take 10000 (randomRs (0,100) g))::[Int]
+  defaultMain $ benchmarks hundred thousand tenthousand
 
-main = defaultMain benchmarks
-
-benchmarks :: [Benchmark]
-benchmarks = [ bgroup "Benchmarks"
-               [ quicksortBenchmark
-               , mergesortBenchmark
-               ]
-             ]
+benchmarks :: [Int] -> [Int] -> [Int] -> [Benchmark]
+benchmarks hundred thousand tenthousand =
+  [ bgroup "Quicksort"
+    [ serialQuicksort hundred thousand tenthousand
+    , parallelQuicksort hundred thousand tenthousand
+    ]
+  , bgroup "Mergesort"
+    [ serialQuicksort hundred thousand tenthousand
+    , parallelQuicksort hundred thousand tenthousand
+    ]
+  ]
 
 
 -------BENCHMARKING QUICKSORT--------
 
-quicksortBenchmark :: Benchmark
-quicksortBenchmark
- = bgroup "Quicksort"
-    [ serialQuicksortBenchmark
-    , parallelQuicksortBenchmark
-    ]
-
-serialQuicksortBenchmark :: Benchmark
-serialQuicksortBenchmark
+serialQuicksort :: [Int] -> [Int] -> [Int] -> Benchmark
+serialQuicksort hundred thousand tenthousand
  = bgroup "Serial"
     [ bench "100"
         ( whnf quicksortSerial hundred )
@@ -40,8 +39,8 @@ serialQuicksortBenchmark
         ( whnf quicksortSerial tenthousand )
     ]
 
-parallelQuicksortBenchmark :: Benchmark
-parallelQuicksortBenchmark
+parallelQuicksort :: [Int] -> [Int] -> [Int] -> Benchmark
+parallelQuicksort hundred thousand tenthousand
  = bgroup "Parallel"
      [ bench "100"
          ( whnf quicksortParallel hundred )
@@ -54,15 +53,8 @@ parallelQuicksortBenchmark
 
 -------BENCHMARKING MERGESORT--------
 
-mergesortBenchmark :: Benchmark
-mergesortBenchmark
- = bgroup "Mergesort"
-    [ serialMergesortBenchmark
-    , parallelMergesortBenchmark
-    ]
-
-serialMergesortBenchmark :: Benchmark
-serialMergesortBenchmark
+serialMergesort :: [Int] -> [Int] -> [Int] -> Benchmark
+serialMergesort hundred thousand tenthousand
  = bgroup "Serial"
      [ bench "100"
          ( whnf mergesortSerial hundred )
@@ -72,8 +64,8 @@ serialMergesortBenchmark
          ( whnf mergesortSerial tenthousand )
      ]
 
-parallelMergesortBenchmark :: Benchmark
-parallelMergesortBenchmark
+parallelMergesort :: [Int] -> [Int] -> [Int] -> Benchmark
+parallelMergesort hundred thousand tenthousand
  = bgroup "Parallel"
      [ bench "100"
          ( whnf mergesortParallel hundred )
