@@ -1,17 +1,19 @@
 module Mergesort where
 
 import Control.Parallel
+import Control.Parallel.Strategies
 
-firstHalf  xs = take (div (length xs) 2) xs
+firstHalf xs = take (div (length xs) 2) xs
 secondHalf xs = drop (div (length xs) 2) xs
 
 -- A sequential mergesort
 mergesortSerial :: Ord a => [a] -> [a]
 mergesortSerial [] = []
 mergesortSerial [a] = [a]
-mergesortSerial xs = mergeSerial
-                     (mergesortSerial (firstHalf xs))
-                     (mergesortSerial (secondHalf xs))
+mergesortSerial xs = do
+                     let first = mergesortSerial $ firstHalf xs
+                     let second = mergesortSerial $ secondHalf xs
+                     mergeSerial first second
 
 mergeSerial :: Ord a => [a] -> [a] -> [a]
 mergeSerial xs [] = xs
@@ -22,13 +24,17 @@ mergeSerial (x:xs) (y:ys) | x <= y    = x:mergeSerial xs (y:ys)
 
 -- A parallel mergesort
 mergesortParallel :: Ord a => [a] -> [a]
-mergesortParallel [] = []
+mergesortParallel []  = []
 mergesortParallel [a] = [a]
-mergesortParallel xs = par firstHalf (pseq secondHalf (
-                       mergeParallel
-                       (mergesortParallel (firstHalf xs))
-                       (mergesortParallel (secondHalf xs))))
+mergesortParallel xs  = runEval $ msortParallel xs
 
+msortParallel :: Ord a => [a] -> Eval [a]
+msortParallel [] = return []
+msortParallel [a] = return [a]
+msortParallel xs = do
+                   first <- rpar $ runEval $ msortParallel $ firstHalf xs
+                   second <- rseq $ runEval $ msortParallel $ secondHalf xs
+                   rseq $ mergeParallel first second
 
 mergeParallel :: Ord a => [a] -> [a] -> [a]
 mergeParallel xs [] = xs
