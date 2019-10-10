@@ -85,13 +85,13 @@ parallelMergesort :: [Int] -> [Int] -> [Int] -> [Int] -> [Int] -> TF.Test
 parallelMergesort ten hundred thousand tenthousand hundredthousand
   = testGroup "Parallel"
     [ testCase "10"
-      ( quicksortParallel ten @?= sort ten )
+      ( mergesortParallel ten @?= sort ten )
       , testCase "100"
-      ( quicksortParallel hundred @?= sort hundred )
+      ( mergesortParallel hundred @?= sort hundred )
       , testCase "1000"
-      ( quicksortParallel thousand @?= sort thousand )
+      ( mergesortParallel thousand @?= sort thousand )
       , testCase "10000"
-      ( quicksortParallel tenthousand @?= sort tenthousand )
+      ( mergesortParallel tenthousand @?= sort tenthousand )
       , testCase "100000"
-      ( quicksortParallel hundredthousand @?= sort hundredthousand )
+      ( mergesortParallel hundredthousand @?= sort hundredthousand )
     ]

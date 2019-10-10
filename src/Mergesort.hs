@@ -3,8 +3,22 @@ module Mergesort where
 import Control.Parallel
 import Control.Parallel.Strategies
 
+firstHalf :: Ord a => [a] -> [a]
+firstHalf [] = []
+firstHalf [a] = []
 firstHalf xs = take (div (length xs) 2) xs
+
+secondHalf :: Ord a => [a] -> [a]
+secondHalf [] = []
+secondHalf [a] = [a]
 secondHalf xs = drop (div (length xs) 2) xs
+
+merge :: Ord a => [a] -> [a] -> [a]
+merge xs [] = xs
+merge [] ys = ys
+merge (x:xs) (y:ys) | x <= y    = x:merge xs (y:ys)
+                    | otherwise = y:merge (x:xs) ys
+
 
 -- A sequential mergesort
 mergesortSerial :: Ord a => [a] -> [a]
@@ -13,31 +27,14 @@ mergesortSerial [a] = [a]
 mergesortSerial xs = do
                      let first = mergesortSerial $ firstHalf xs
                      let second = mergesortSerial $ secondHalf xs
-                     mergeSerial first second
-
-mergeSerial :: Ord a => [a] -> [a] -> [a]
-mergeSerial xs [] = xs
-mergeSerial [] ys = ys
-mergeSerial (x:xs) (y:ys) | x <= y    = x:mergeSerial xs (y:ys)
-                          | otherwise = y:mergeSerial (x:xs) ys
+                     merge first second
 
 
 -- A parallel mergesort
 mergesortParallel :: Ord a => [a] -> [a]
-mergesortParallel []  = []
+mergesortParallel [] = []
 mergesortParallel [a] = [a]
-mergesortParallel xs  = runEval $ msortParallel xs
-
-msortParallel :: Ord a => [a] -> Eval [a]
-msortParallel [] = return []
-msortParallel [a] = return [a]
-msortParallel xs = do
-                   first <- rpar $ runEval $ msortParallel $ firstHalf xs
-                   second <- rseq $ runEval $ msortParallel $ secondHalf xs
-                   rseq $ mergeParallel first second
-
-mergeParallel :: Ord a => [a] -> [a] -> [a]
-mergeParallel xs [] = xs
-mergeParallel [] ys = ys
-mergeParallel (x:xs) (y:ys) | x <= y    = x:mergeParallel xs (y:ys)
-                            | otherwise = y:mergeParallel (x:xs) ys
+mergesortParallel xs = runEval $ do
+                                 first <- rpar $ mergesortParallel $ firstHalf xs
+                                 second <- rpar $ mergesortParallel $ secondHalf xs
+                                 rseq $ merge first second
